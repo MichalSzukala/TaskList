@@ -63,7 +63,7 @@ public class UserInput {
         String[] fullCommand = processCommand(command);
         boolean shouldExitProgram = false; 
         
-        switch(fullCommand[0]){
+        switch(getCommand(fullCommand)){
                 
             case "save":
                 controller.saveList();
@@ -73,31 +73,45 @@ public class UserInput {
                 controller.loadList();
                 break;
                 
+            case "help":
+                printAllCommands();
+                break;    
+                
             case "exit":
                 shouldExitProgram = true;
                 break;    
                 
             case "add":
-                addCommand(fullCommand);
+                addTaskToTaskList(fullCommand);
                 break;
                 
-            case "print":
-                controller.showAllTasks();
+            case "edit":
                 break;
                 
             case "remove":
-                removeCommand(fullCommand);
+                removeTaskFromList(fullCommand);
                 break;
                 
-            case "help":
-                
+            case "done":
+                markTaskAsDone(fullCommand);
                 break;
                 
+            case "print":
+                printListOfTasks(fullCommand);
+                break;
+
             default:
                 output.printErrorMessage();
         }
         return shouldExitProgram;
     }
+    
+    
+    private String getCommand(String[] fullCommand){
+        return fullCommand[0];
+    }
+    
+    
     
     /**
     * Cleans the command from extra white spaces and upper cases
@@ -112,12 +126,22 @@ public class UserInput {
         return splitedCommand;
     }
     
+    
+    /**
+    * User types "help" and menu with all of the commands is printed
+    */
+    private void printAllCommands(){
+        output.fileManipulationCommands();
+        output.taskManipulationCommands();
+    }
+    
+    
     /**
     * Sends "add" command typed by user to the Controller
     * 
     * @param fullCommand    The command received from user divided into pieces
     */
-    private void addCommand(String[] fullCommand){
+    private void addTaskToTaskList(String[] fullCommand){
         if(validateAddCommand(fullCommand)){
             TaskDTO task = createTask(fullCommand);
             controller.addTask(task);        
@@ -127,17 +151,10 @@ public class UserInput {
     }
     
     
-    /**
-    * Validates format of "add" command
-    * 
-    * @param fullCommand    The command received from user divided into pieces
-    * @return true/false of validation
-    */
     private boolean validateAddCommand(String[] fullCommand){
         boolean test = false;
-        int lengthOfCommand = 5;
-        if(fullCommand.length == lengthOfCommand){
-            String date = fullCommand[2];
+        if(checkingLengthOfCommand(fullCommand, numberOfOptionsForAddCommand())){
+            String date = fullCommand[positionOfDateInAddCommand()];
             if(validateDate(date)){
                 test = true;
             }
@@ -146,22 +163,60 @@ public class UserInput {
     }
     
     /**
-    * Validates format of date
+    * Checks if command have needed number of command's options
     * 
-    * @param date    The date received from user who was adding new task to the list
-    * @return true/false of validation
+    * @param fullCommand            The command received from user divided into pieces
+    * @param neededLengthOfCommand  Needed number of options following the command
+    * @return true/false if number of options is correct
     */
+    private boolean checkingLengthOfCommand(String[] fullCommand, int neededLengthOfCommand){
+        if(fullCommand.length == neededLengthOfCommand){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    
+    private int numberOfOptionsForAddCommand(){
+        return 5;
+    }
+    
+    private int positionOfDateInAddCommand(){
+        return 2;
+    }
+    
+    
+    
     private boolean validateDate(String date){
         
         boolean test = true;
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-
+        
+        SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
+        formatter.setLenient(false);
+        
+        
         try {
             formatter.parse(date);
         } catch (ParseException e) {
             test = false;
         }
         return test;
+    }
+    
+    
+    private Date parseDate(String dateInString){
+        
+        
+        SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
+        Date date = null;
+        
+        try{
+            date = formatter.parse(dateInString);
+        }catch(ParseException e){
+            e.printStackTrace();
+        }
+        return date;
     }
     
     /**
@@ -183,33 +238,86 @@ public class UserInput {
         return createdTask;
     }
     
-    /**
-    * Changes due date of task from a String into Date type
-    * 
-    * @param dateInString      Due date of the task  
-    * @return Date as a Date type
-    */
-    private Date parseDate(String dateInString){
-        
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        Date date = null;
-        
-        try{
-            date = formatter.parse(dateInString);
-        }catch(ParseException e){
-            e.printStackTrace();
-        }
-        return date;
-    }
+    
     
     /**
     * Sends "remove" command typed by user to the Controller
     * 
     * @param fullCommand    The command received from user divided into pieces
     */
-    private void removeCommand(String[] fullCommand){
-        
+    private void removeTaskFromList(String[] fullCommand){
+        if(validateCommandThatRequireNumberOfTask(fullCommand)){
+            int index = Integer.parseInt(getTaskNumberFromCommand(fullCommand));
+            controller.removeTask(index);
+        }else{
+            output.printErrorMessage();
+        }
     }
+    
+    private String getTaskNumberFromCommand(String[] fullCommand){
+        return fullCommand[1];
+    }
+    
+    
+    /**
+    * Validates commands which are using number of the task as part of the command
+    * 
+    * @param fullCommand    The command received from user divided into pieces
+    * @return true/false of validation
+    */
+    private boolean validateCommandThatRequireNumberOfTask(String[] fullCommand){
+        boolean test = false;
+        if(checkingLengthOfCommand(fullCommand, sizeOfCommandUsingTaskNumber())){
+            String taskNumberInString = fullCommand[postionOfTaskNumberInCommandUsingTaskNumber()];
+            if(validateTaskNumber(taskNumberInString)){
+                int taskNumber = Integer.parseInt(taskNumberInString);
+                if(taskNumber < controller.sizeOfTaskList()){
+                    test = true;
+                }
+            }
+        }
+        return test;  
+    }
+    
+    
+    private boolean validateTaskNumber(String taskNumberInString){
+        boolean test = true;
+
+        try {
+            Integer.parseInt(taskNumberInString);
+        } catch (NumberFormatException e) {
+            test = false;
+        }
+        
+        return test;
+    }    
+    
+    
+    
+    private int sizeOfCommandUsingTaskNumber(){
+        return 2;
+    }
+    private int postionOfTaskNumberInCommandUsingTaskNumber(){
+        return 1;
+    }
+    
+    
+    /**
+    * Sends "done" command typed by user to the Controller
+    * 
+    * @param fullCommand    The command received from user divided into pieces
+    */
+    
+    private void markTaskAsDone(String[] fullCommand){
+        if(validateCommandThatRequireNumberOfTask(fullCommand)){
+            int index = Integer.parseInt(getTaskNumberFromCommand(fullCommand));
+            controller.markTaskAsDone(index);
+        }else{
+            output.printErrorMessage();
+        }
+    }
+    
+    private void printListOfTasks(String[] fullCommand){}
     
     
     

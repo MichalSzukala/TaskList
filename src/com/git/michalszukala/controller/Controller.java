@@ -48,6 +48,10 @@ public class Controller {
        System.out.println("TASK REMOVED");
    }
    
+   public void markTaskAsDone(int index){
+        System.out.println("TASK MARKED AS DONE");
+    }
+   
    
 }
 

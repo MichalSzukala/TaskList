@@ -22,16 +22,22 @@ public class UserOutput {
     
     
     private void startMessage(){ 
-        System.out.println("\n\n***************************************************************************************");
-        String formatString = String.format("%60s", "LIST OF TASKS TO DO by Michal Szukala");
+        printStars();
+        String formatString = String.format("%70s", "LIST OF TASKS TO DO by Michal Szukala");
         System.out.printf(formatString);
-        System.out.println("\n\n***************************************************************************************");
+        printStars();
         
     }
     
+    private void printStars(){
+        System.out.println("\n\n**********************************************************************************************************");
+    }
     
-    void fileManipulationCommands(){
-        System.out.println("\n********************************List of commands***************************************\n");
+    /**
+    * Display all commands responsible for file manipulation
+    */
+    public void fileManipulationCommands(){
+        System.out.println("\n*******************************************List of commands***********************************************\n");
         
         String saveString = String.format("\n%-40s%s", "save[file name]","- Save to the File");
         System.out.printf(saveString);
@@ -48,8 +54,10 @@ public class UserOutput {
     }
     
    
-    
-    void taskManipulationCommands(){
+    /**
+    * Display all commands responsible for manipulating list of tasks
+    */
+    public void taskManipulationCommands(){
         String newTaskString = String.format("\n\n%-40s%s", "add[task][due date][status][project]","- Create New Task, due date is in yy/mm/dd format");
         System.out.printf(newTaskString);
         
@@ -65,9 +73,8 @@ public class UserOutput {
         String printTaskString = String.format("\n%-40s%s", "print[option]","- Print the List of Tasks.  Options choice: [-a][-d][-i][-p]\n");
         System.out.printf(printTaskString);
         printOptions();
-        
-        
-        System.out.println("\n***************************************************************************************\n");
+
+        printStars();
     }
     
     
@@ -78,22 +85,31 @@ public class UserOutput {
         String optionD = String.format("%11s%s", "[-d]","- print tasks which have due date today\n");
         System.out.printf(optionD);
         
-        String optionI = String.format("%11s%s", "[-i]","- print tasks with \"imortant\" status\n");
+        String optionI = String.format("%11s%s", "[-i]","- print tasks with \"important\" status\n");
         System.out.printf(optionI);
         
         String optionP = String.format("%11s%s", "[-p]","- print tasks belonging to certain project\n");
         System.out.printf(optionP);
     }
     
-    void askForInput(){
+    /**
+    * Ask user for input
+    */
+    public void askForInput(){
         System.out.print("\nGive me a order: ");
     }
     
-    void askForProject(){
+    /**
+    * Ask user for name of the project
+    */
+    public void askForProject(){
         System.out.print("\nName of the Project: ");
     }
     
-    void printErrorMessage(){
+    /**
+    * Prints Error message
+    */
+    public void printErrorMessage(){
         System.out.println("Something is Wrong with Your Command!! Try again");
     }
     
