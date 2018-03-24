@@ -1,5 +1,6 @@
 package com.git.michalszukala.view;
 
+import com.git.michalszukala.controller.Controller;
 import java.util.List;
 
 /**
@@ -10,6 +11,15 @@ import java.util.List;
  */
 public class UserOutput {
     
+    
+    Controller controller;
+    
+    /**
+    * Creates Controller object which is delegating all the tasks to proper classes
+    */
+    public UserOutput(Controller controller){
+        this.controller = controller;
+    }
     
     /**
     * Display all the starting messages

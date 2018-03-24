@@ -23,7 +23,7 @@ public class UserInput {
     */
     public UserInput(){
         controller = new Controller();
-        output = new UserOutput();
+        output = new UserOutput(controller);
     }
     
     /**
@@ -34,10 +34,11 @@ public class UserInput {
         askForInput();
     }
     
+
     /**
     * Asks user for input until user will not finish program by typing "exit"
     */
-    public void askForInput() 
+      public void askForInput() 
     {              
         boolean finished = false;
         String command;
@@ -46,24 +47,253 @@ public class UserInput {
             output.askForInput();
             Scanner scanner = new Scanner(System.in);
             command = scanner.nextLine();
-            finished = interpreteCommand(command);
+            if(validateCommand(command)){
+                CommandDTO commandObject = createCommand(command);
+                finished = interpreteCommand(commandObject);
+            }else{
+                output.printErrorMessage();
+            }
         }
         
         System.out.println("See you later");
         System.exit(0);
     }
     
+    
+    
+      
+    private boolean validateCommand(String command){
+        boolean isValidCommand = false;
+        
+        String[] fullCommand = processCommand(command);
+        String mainCommand = getMainCommandFromFullCommand(fullCommand);
+        
+        switch(mainCommand){
+            case "add":
+                isValidCommand = validateAddCommand(fullCommand);
+                break;
+            case "print":
+                isValidCommand = validatePrintCommand(fullCommand);
+                break; 
+            case "exit":
+                isValidCommand = true;
+                break;
+            case "help":
+                isValidCommand = true;
+                break;
+            default:
+                isValidCommand = validateCommandThatRequireNumberOfTask(fullCommand);
+                break; 
+        }
+
+        return isValidCommand;
+    }
+    
+    private String getMainCommandFromFullCommand(String[] fullCommand){
+        return fullCommand[0];
+    }
+    
+    
+    /**
+    * Cleans the command from extra white spaces and upper cases
+    * Turn the command to array for later processes
+    * 
+    * @param command    The command received from user
+    * @return Separated command received from user 
+    */
+    private String[] processCommand(String command){
+        command = command.trim().toLowerCase();
+        //String[] splitedCommand = command.split("\\s+");
+        //" +(?=(([^\"]*\"){2})*[^\"]*$)"
+        String[] splitedCommand = command.split("\\s+(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+        for (int i = 0; i < splitedCommand.length; i++){
+            splitedCommand[i] = splitedCommand[i].replaceAll("\"", "");
+        }
+        return splitedCommand;
+    }
+    
+    
+    
+     private boolean validateAddCommand(String[] fullCommand){
+        boolean test = false;
+        if(checkingLengthOfCommand(fullCommand, numberOfOptionsForAddCommand())){
+            String date = getDateFromAddCommand(fullCommand);
+            if(validateDate(date)){
+                test = true;
+            }
+        }
+        return test;  
+    }
+     
+     private String getDateFromAddCommand(String[] fullCommand){
+        return fullCommand[2];
+    }
+     
+     private boolean checkingLengthOfCommand(String[] fullCommand, int neededLengthOfCommand){
+        if(fullCommand.length == neededLengthOfCommand){
+            return true;
+        }else{
+            return false;
+        }
+    }
+     
+    private int numberOfOptionsForAddCommand(){
+        return 5;
+    }
+     
+     
+      private boolean validateDate(String date){
+        
+        boolean test = true;
+        
+        SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
+        formatter.setLenient(false);
+        
+        try {
+            formatter.parse(date);
+        } catch (ParseException e) {
+            test = false;
+        }
+        return test;
+    }
+     
+    
+    /**
+    * Validates format of "print" command
+    * 
+    * @param fullCommand    The command received from user divided into pieces
+    * @return true/false of validation
+    */
+    private boolean validatePrintCommand(String[] fullCommand){
+        boolean test = false;
+        if(checkingLengthOfCommand(fullCommand, sizeOfPrintCommand())){
+            String commandsOption = getOptionFromFullCommand(fullCommand);
+            if(commandsOption.contains("-") && validOptionsLettersForPrintCommand(commandsOption)){
+                test = true;
+            }
+        }
+        return test;  
+    }
+    
+    private boolean validOptionsLettersForPrintCommand(String word){
+        boolean test = true;
+        
+        for(int i = 1; i < word.length(); i++){
+            if(word.charAt(i) != 'a' && word.charAt(i) != 'i' && word.charAt(i) != 'd' && word.charAt(i) != 'p'){
+                test = false;
+            }
+        }
+        
+        return test; 
+    }
+    
+    private String getOptionFromFullCommand(String[] fullCommand){
+        return fullCommand[1];
+    }
+    
+    private int sizeOfPrintCommand(){
+        return 2;
+    }
+    
+    
+    private boolean validateCommandThatRequireNumberOfTask(String[] fullCommand){
+        boolean test = false;
+        if(checkingLengthOfCommand(fullCommand, sizeOfCommandUsingTaskNumber())){
+            String taskNumberInString = getOptionFromFullCommand(fullCommand);
+            if(validateTaskNumber(taskNumberInString)){
+                int taskNumber = Integer.parseInt(taskNumberInString);
+                if(taskNumber < controller.sizeOfTaskList()){
+                    test = true;
+                }
+            }
+        }
+        return test;  
+    }
+    
+    private int sizeOfCommandUsingTaskNumber(){
+        return 2;
+    }
+    
+    
+    
+    private boolean validateTaskNumber(String taskNumberInString){
+        boolean test = true;
+
+        try {
+            Integer.parseInt(taskNumberInString);
+        } catch (NumberFormatException e) {
+            test = false;
+        }
+        
+        return test;
+    }    
+
+    
+    private CommandDTO createCommand(String command){
+        String[] fullCommand = processCommand(command);
+        String mainCommand = getMainCommandFromFullCommand(fullCommand);
+        String optionOfCommand = null;
+        if(fullCommand.length > 1){
+            optionOfCommand = getOptionFromFullCommand(fullCommand);
+        }
+        
+        CommandDTO commandObject = null;
+        
+        switch(mainCommand){
+            case "add":
+                commandObject =  createAddCommand(command);
+                break;
+            case "exit":
+                commandObject = new CommandDTO(mainCommand);
+                break;
+            default:
+                commandObject = new CommandDTO(mainCommand, optionOfCommand);
+                break;    
+        }
+        
+        return commandObject;
+    }
+    
+    private AddCommandDTO createAddCommand(String command){
+        
+        String[] fullCommand = processCommand(command);
+        String mainCommand = getMainCommandFromFullCommand(fullCommand);
+        String task = getTaskFromAddCommand(fullCommand);
+        String date = getDateFromAddCommand(fullCommand);
+        String status = getStatusFromAddCommand(fullCommand);
+        String project = getProjectFromAddCommand(fullCommand);
+        AddCommandDTO addCommand = new AddCommandDTO(mainCommand, task, date, status, project);
+        
+        return addCommand;
+
+    }
+
+    
+    private String getTaskFromAddCommand(String[] fullCommand){
+        return fullCommand[1];
+    }
+
+    private String getStatusFromAddCommand(String[] fullCommand){
+        return fullCommand[3];
+    }
+    
+    private String getProjectFromAddCommand(String[] fullCommand){
+        return fullCommand[4];
+    }
+    
+    
+    
     /**
     * Interprets and validates command received from user and follow the command order
     * 
     * @param command    The command received from user
     */
-    private boolean interpreteCommand(String command){
+    private boolean interpreteCommand(CommandDTO command){
         
-        String[] fullCommand = processCommand(command);
+        
         boolean shouldExitProgram = false; 
         
-        switch(getCommand(fullCommand)){
+        switch(command.getCommand()){
                 
             case "save":
                 controller.saveList();
@@ -82,48 +312,28 @@ public class UserInput {
                 break;    
                 
             case "add":
-                addTaskToTaskList(fullCommand);
+                addTaskToTaskList(command);
                 break;
                 
             case "edit":
                 break;
                 
             case "remove":
-                removeTaskFromList(fullCommand);
+                removeTaskFromList(command);
                 break;
                 
             case "done":
-                markTaskAsDone(fullCommand);
+                markTaskAsDone(command);
                 break;
                 
             case "print":
-                printListOfTasks(fullCommand);
+                printListOfTasks(command);
                 break;
 
             default:
                 output.printErrorMessage();
         }
         return shouldExitProgram;
-    }
-    
-    
-    private String getCommand(String[] fullCommand){
-        return fullCommand[0];
-    }
-    
-    
-    
-    /**
-    * Cleans the command from extra white spaces and upper cases
-    * Turn the command to array for later processes
-    * 
-    * @param command    The command received from user
-    * @return Separated command received from user 
-    */
-    private String[] processCommand(String command){
-        command = command.trim().toLowerCase();
-        String[] splitedCommand = command.split("\\s+");
-        return splitedCommand;
     }
     
     
@@ -141,73 +351,33 @@ public class UserInput {
     * 
     * @param fullCommand    The command received from user divided into pieces
     */
-    private void addTaskToTaskList(String[] fullCommand){
-        if(validateAddCommand(fullCommand)){
-            TaskDTO task = createTask(fullCommand);
-            controller.addTask(task);        
-        }else{
-            output.printErrorMessage();
-        }  
-    }
-    
-    
-    private boolean validateAddCommand(String[] fullCommand){
-        boolean test = false;
-        if(checkingLengthOfCommand(fullCommand, numberOfOptionsForAddCommand())){
-            String date = fullCommand[positionOfDateInAddCommand()];
-            if(validateDate(date)){
-                test = true;
-            }
-        }
-        return test;  
+    private void addTaskToTaskList(CommandDTO command){
+            
+        TaskDTO task = createTask((AddCommandDTO) command);
+        controller.addTask(task);                      
     }
     
     /**
-    * Checks if command have needed number of command's options
+    * creates DTO object for transporting task to the list of tasks
     * 
-    * @param fullCommand            The command received from user divided into pieces
-    * @param neededLengthOfCommand  Needed number of options following the command
-    * @return true/false if number of options is correct
+    * @param fullCommand      The command received from user divided into pieces  
+    * @return Task DTO object
     */
-    private boolean checkingLengthOfCommand(String[] fullCommand, int neededLengthOfCommand){
-        if(fullCommand.length == neededLengthOfCommand){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    
-    
-    private int numberOfOptionsForAddCommand(){
-        return 5;
-    }
-    
-    private int positionOfDateInAddCommand(){
-        return 2;
-    }
-    
-    
-    
-    private boolean validateDate(String date){
+    private TaskDTO createTask(AddCommandDTO addCommand){
         
-        boolean test = true;
+        String task = addCommand.getTask();
+        String dateInString = addCommand.getDate();
+        Date date = parseDate(dateInString);
+        String status = addCommand.getStatus();
+        String project = addCommand.getProject();
         
-        SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
-        formatter.setLenient(false);
+        TaskDTO createdTask = new TaskDTO(task, date, status, project);
         
-        
-        try {
-            formatter.parse(date);
-        } catch (ParseException e) {
-            test = false;
-        }
-        return test;
+        return createdTask;
     }
-    
-    
+      
+      
     private Date parseDate(String dateInString){
-        
-        
         SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
         Date date = null;
         
@@ -219,110 +389,28 @@ public class UserInput {
         return date;
     }
     
-    /**
-    * creates DTO object for transporting task to the list of tasks
-    * 
-    * @param fullCommand      The command received from user divided into pieces  
-    * @return Task DTO object
-    */
-    private TaskDTO createTask(String[] fullCommand){
-        
-        String task = fullCommand[1];
-        String dateInString = fullCommand[2];
-        Date date = parseDate(dateInString);
-        String status = fullCommand[3];
-        String project = fullCommand[4];
-        
-        TaskDTO createdTask = new TaskDTO(task, date, status, project);
-        
-        return createdTask;
-    }
-    
-    
-    
+      
     /**
     * Sends "remove" command typed by user to the Controller
     * 
     * @param fullCommand    The command received from user divided into pieces
     */
-    private void removeTaskFromList(String[] fullCommand){
-        if(validateCommandThatRequireNumberOfTask(fullCommand)){
-            int index = Integer.parseInt(getTaskNumberFromCommand(fullCommand));
-            controller.removeTask(index);
-        }else{
-            output.printErrorMessage();
-        }
-    }
-    
-    private String getTaskNumberFromCommand(String[] fullCommand){
-        return fullCommand[1];
-    }
-    
-    
-    /**
-    * Validates commands which are using number of the task as part of the command
-    * 
-    * @param fullCommand    The command received from user divided into pieces
-    * @return true/false of validation
-    */
-    private boolean validateCommandThatRequireNumberOfTask(String[] fullCommand){
-        boolean test = false;
-        if(checkingLengthOfCommand(fullCommand, sizeOfCommandUsingTaskNumber())){
-            String taskNumberInString = fullCommand[postionOfTaskNumberInCommandUsingTaskNumber()];
-            if(validateTaskNumber(taskNumberInString)){
-                int taskNumber = Integer.parseInt(taskNumberInString);
-                if(taskNumber < controller.sizeOfTaskList()){
-                    test = true;
-                }
-            }
-        }
-        return test;  
-    }
-    
-    
-    private boolean validateTaskNumber(String taskNumberInString){
-        boolean test = true;
-
-        try {
-            Integer.parseInt(taskNumberInString);
-        } catch (NumberFormatException e) {
-            test = false;
-        }
+    private void removeTaskFromList(CommandDTO command){
         
-        return test;
-    }    
-    
-    
-    
-    private int sizeOfCommandUsingTaskNumber(){
-        return 2;
-    }
-    private int postionOfTaskNumberInCommandUsingTaskNumber(){
-        return 1;
+        int index = Integer.parseInt(command.getOption());
+        controller.removeTask(index);
     }
     
     
+
     /**
     * Sends "done" command typed by user to the Controller
     * 
     * @param fullCommand    The command received from user divided into pieces
     */
-    
-    private void markTaskAsDone(String[] fullCommand){
-        if(validateCommandThatRequireNumberOfTask(fullCommand)){
-            int index = Integer.parseInt(getTaskNumberFromCommand(fullCommand));
+    private void markTaskAsDone(CommandDTO command){
+       
+            int index = Integer.parseInt(command.getOption());
             controller.markTaskAsDone(index);
-        }else{
-            output.printErrorMessage();
-        }
+        
     }
-    
-    private void printListOfTasks(String[] fullCommand){}
-    
-    
-    
-    
-}
-
-
-
