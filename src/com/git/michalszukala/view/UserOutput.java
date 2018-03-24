@@ -1,7 +1,7 @@
 package com.git.michalszukala.view;
 
 import com.git.michalszukala.controller.Controller;
-import java.util.List;
+
 
 /**
  * Prints all the messages and informations for the user 
@@ -11,8 +11,9 @@ import java.util.List;
  */
 public class UserOutput {
     
-    
     Controller controller;
+    private final String COLOR_RED = "\u001B[31m";
+    private final String COLOR_RESET = "\u001b[0m";
     
     /**
     * Creates Controller object which is delegating all the tasks to proper classes
@@ -40,7 +41,7 @@ public class UserOutput {
     }
     
     private void printStars(){
-        System.out.println("\n\n**********************************************************************************************************");
+        System.out.println("\n**********************************************************************************************************");
     }
     
     /**
@@ -49,7 +50,7 @@ public class UserOutput {
     public void fileManipulationCommands(){
         System.out.println("\n*******************************************List of commands***********************************************\n");
         
-        String saveString = String.format("\n%-40s%s", "save[file name]","- Save to the File");
+        String saveString = String.format("\n%-40s%s", "save[file name]","- Save to the File.  With the use of \"  \" it is possible to input multiple words");
         System.out.printf(saveString);
         
         String loadString = String.format("\n%-40s%s", "load[file name]","- Load the File");
@@ -68,7 +69,7 @@ public class UserOutput {
     * Display all commands responsible for manipulating list of tasks
     */
     public void taskManipulationCommands(){
-        String newTaskString = String.format("\n\n%-40s%s", "add[task][due date][status][project]","- Create New Task, due date is in yy/mm/dd format");
+        String newTaskString = String.format("\n\n%-40s%s", "add[task][due date][status][project]","- Create New Task.  Due date is in yy/mm/dd format");
         System.out.printf(newTaskString);
         
         String editTaskString = String.format("\n%-40s%s", "edit[task number]","- Edit the Task");
@@ -82,7 +83,11 @@ public class UserOutput {
         
         String printTaskString = String.format("\n%-40s%s", "print[option]","- Print the List of Tasks.  Options choice: [-a][-d][-i][-p]\n");
         System.out.printf(printTaskString);
+        
         printOptions();
+        
+        System.out.println("\nIt is possible to combine command's options. For example: \"print -id\" will print important and urgent tasks");
+
 
         printStars();
     }
@@ -106,7 +111,7 @@ public class UserOutput {
     * Ask user for input
     */
     public void askForInput(){
-        System.out.print("\nGive me a order: ");
+        System.out.print("\nGive me an order: ");
     }
     
     /**
@@ -123,4 +128,187 @@ public class UserOutput {
         System.out.println("Something is Wrong with Your Command!! Try again");
     }
     
+    /**
+    * Prints first lines of the List of Tasks
+    */
+    public void printListOfTasksStartText(){
+        System.out.println("\n*****************************************Your List of Tasks***********************************************\n");
+        
+        String listPropherties = String.format("%-7s%-40s%-15s%-15s%-15s", "Task#", "Task", "Due Date", "Status", "Project");
+        System.out.printf(listPropherties + "\n");
+    }
+    
+    /**
+    * Prints single Task on the screen
+    */
+    public void printSingleTask(TaskDTO task, int index, String color){
+        String taskNumber = String.format("%-7s", index);
+        System.out.printf(color + taskNumber);
+            
+        String taskMessage = String.format("%-40s", task.getTask());
+        System.out.printf(color + taskMessage);
+            
+        String dueDate = String.format("%-15tF", task.getDueDate());
+        System.out.printf(color + dueDate);
+            
+        String taskStatus = String.format("%-15s", task.getStatus());
+        System.out.printf(color + taskStatus);
+            
+        String taskProject = String.format("%-15s %n", task.getProject());
+        System.out.printf(color + taskProject);
+        
+        System.out.print(COLOR_RESET);
+    }
+    
+    /**
+    * Prints message if there is no tasks in the list of tasks
+    */
+    public void noTasksInList(){
+        System.out.println("There is no tasks in the list\n");
+    }
+
+    /**
+    * Prints all task from the list of tasks
+    */
+    public void printWholeListOfTasks(){
+        printListOfTasksStartText();
+        
+        for(int index = 0; index < controller.sizeOfTaskList(); index++){
+            TaskDTO task = controller.getTaskFromList(index);
+            if(controller.isTaskUrgent(index)){
+                printSingleTask(task, index, COLOR_RED);
+            }else{
+                printSingleTask(task, index, COLOR_RESET);
+            }
+        }
+        if(controller.sizeOfTaskList() == 0){
+            noTasksInList();
+        }
+    }
+    
+    
+    /**
+    * Prints important tasks and tasks with due date of today from the list of tasks
+    */
+    public void printImportantAndUrgentTasks(){
+        printListOfTasksStartText();
+        
+        for(int index = 0; index < controller.sizeOfTaskList(); index++){
+            TaskDTO task = controller.getTaskFromList(index);
+            if(controller.isTaskUrgent(index) && controller.isTaskImportant(index)){
+                printSingleTask(task, index, COLOR_RED);
+            }   
+        }
+        if(controller.sizeOfTaskList() == 0){
+            noTasksInList();
+        }
+    }
+    
+    /**
+    * Prints important tasks from the list of tasks
+    */
+    public void printImportantTasks(){
+        printListOfTasksStartText();
+        
+        for(int index = 0; index < controller.sizeOfTaskList(); index++){
+            TaskDTO task = controller.getTaskFromList(index);
+            if(controller.isTaskImportant(index)){
+                printSingleTask(task, index, COLOR_RESET);
+            }   
+        }
+        if(controller.sizeOfTaskList() == 0){
+            noTasksInList();
+        }
+    }
+    
+    /**
+    * Prints tasks which have due date of today
+    */
+    public void printUrgentTasks(){
+        printListOfTasksStartText();
+        
+        for(int index = 0; index < controller.sizeOfTaskList(); index++){
+            TaskDTO task = controller.getTaskFromList(index);
+            if(controller.isTaskUrgent(index)){
+                printSingleTask(task, index, COLOR_RED);
+            }   
+        }
+        if(controller.sizeOfTaskList() == 0){
+            noTasksInList();
+        }
+    }
+    
+    /**
+    * Prints tasks belonging to specific project
+    */
+    public void printListOfTasksOfProject(String project){
+        printListOfTasksStartText();
+        
+        for(int index = 0; index < controller.sizeOfTaskList(); index++){
+            TaskDTO task = controller.getTaskFromList(index);
+            if(controller.isProjectInTask(project, index)){
+                printSingleTask(task, index, COLOR_RESET);
+            }
+        }
+        
+        if(controller.sizeOfTaskList() == 0){
+            noTasksInList();
+        }
+    }
+    
+    /**
+    * Prints important tasks and tasks having due date of today
+    */
+    public void printImportantAndUrgentTasksOfProject(String project){
+        printListOfTasksStartText();
+        
+        for(int index = 0; index < controller.sizeOfTaskList(); index++){
+            TaskDTO task = controller.getTaskFromList(index);
+            if(controller.isProjectInTask(project, index) && controller.isTaskUrgent(index) && controller.isTaskImportant(index)){
+                printSingleTask(task, index, COLOR_RED);
+            }
+        }
+        
+        if(controller.sizeOfTaskList() == 0){
+            noTasksInList();
+        }
+    }
+    
+    /**
+    * Prints important tasks and tasks belonging to specific project from the list of tasks
+    */
+    public void printImportantTasksOfProject(String project){
+        printListOfTasksStartText();
+        
+        for(int index = 0; index < controller.sizeOfTaskList(); index++){
+            TaskDTO task = controller.getTaskFromList(index);
+            if(controller.isProjectInTask(project, index) && controller.isTaskImportant(index)){
+                printSingleTask(task, index, COLOR_RESET);
+            }
+        }
+        
+        if(controller.sizeOfTaskList() == 0){
+            noTasksInList();
+        }
+    }
+    
+    /**
+    * Prints tasks with due date of today and tasks belonging to specific project from the list of tasks
+    */
+    public void printUrgentTasksOfProject(String project){
+        printListOfTasksStartText();
+        
+        for(int index = 0; index < controller.sizeOfTaskList(); index++){
+            TaskDTO task = controller.getTaskFromList(index);
+            if(controller.isProjectInTask(project, index) && controller.isTaskUrgent(index)){
+                printSingleTask(task, index, COLOR_RED);
+            }
+        }
+        
+        if(controller.sizeOfTaskList() == 0){
+            noTasksInList();
+        }
+    }
+    
+
 }
