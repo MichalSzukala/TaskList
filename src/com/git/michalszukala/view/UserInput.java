@@ -414,4 +414,68 @@ public class UserInput {
             controller.markTaskAsDone(index);
         
     }
+    
+    
+     private void printListOfTasks(CommandDTO command){
+        
+        String option = command.getOption();
+        if(option.contains("a")){
+            controller.sortTasksAccordingToDate();
+            output.printWholeListOfTasks();
+        }else if(option.contains("p")){
+            controller.sortTasksAccordingToDate();
+            printTasksInvolveProject(option);
+        }else if(option.contains("i")){
+            controller.sortTasksAccordingToDate();
+            printTasksInvolveStatus(option);
+        }else if(option.contains("d")){
+            controller.sortTasksAccordingToDate();
+            output.printUrgentTasks();
+        }else{
+            output.printErrorMessage();
+        }
+    }
+    
+    
+    
+    
+    
+    private void printTasksInvolveProject(String option){
+        String project = null;
+        if(option.contains("i") && option.contains("d")){
+            project = projectName();
+            output.printImportantAndUrgentTasksOfProject(project);
+        }else if(option.contains("i")){
+            project = projectName();
+            output.printImportantTasksOfProject(project);
+        }else if(option.contains("d")){
+            project = projectName();
+            output.printUrgentTasksOfProject(project);
+        }else{
+            project = projectName();
+            output.printListOfTasksOfProject(project);
+        }
+       
+    }
+    
+    
+    private void printTasksInvolveStatus(String option){
+        if(option.contains("d")){
+            output.printImportantAndUrgentTasks();
+        }else{
+            output.printImportantTasks();
+        }
+    }
+    
+
+    
+    
+    private String projectName(){
+        output.askForProject();
+        Scanner scanner = new Scanner(System.in);
+        String project = scanner.nextLine();
+        project = project.trim().toLowerCase();
+        return project;
+    }
+    
 }
