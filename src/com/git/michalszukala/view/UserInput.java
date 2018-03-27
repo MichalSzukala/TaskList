@@ -17,6 +17,12 @@ public class UserInput {
     private Controller controller;
     private UserOutput output;
     
+    private final int numberOfOptionsForAddCommand = 5;
+    private final int sizeOfPrintCommand = 2;
+    private final int sizeOfCommandUsingTaskNumber = 2;
+    private final int sizeOfFileManipulationCommand = 2;
+    
+    
     /**
     * Creates Controller object which is delegating all the tasks to proper classes
     * Creates UserOutput object which is displaying all the output on the screen
@@ -26,10 +32,11 @@ public class UserInput {
         output = new UserOutput(controller);
     }
     
+    
     /**
     * Sends request to UserOutput class to create GUI, and starts asking user for input
     */
-    public void startProgram(){
+    public void startGUI(){
         output.createDisplay();
         askForInput();
     }
@@ -38,13 +45,13 @@ public class UserInput {
     /**
     * Asks user for input until user will not finish program by typing "exit"
     */
-      public void askForInput() 
+      private void askForInput() 
     {              
         boolean finished = false;
         String command;
         
         while (! finished) {
-            output.askForInput();
+            output.askForInputMessage();
             Scanner scanner = new Scanner(System.in);
             command = scanner.nextLine();
             if(validateCommand(command)){
@@ -61,7 +68,11 @@ public class UserInput {
     
     
     
-      
+    /**
+    * Validate all the command if they are typed in the correct format
+    * @param command    The command typed by the user
+    * @return   True/false if command has valid format
+    */
     private boolean validateCommand(String command){
         boolean isValidCommand = false;
         
@@ -81,6 +92,12 @@ public class UserInput {
             case "help":
                 isValidCommand = true;
                 break;
+            case "save":
+                isValidCommand = validateFileManipulationCommand(fullCommand);
+                break;
+            case "load":
+                isValidCommand = validateFileManipulationCommand(fullCommand);
+                break;
             default:
                 isValidCommand = validateCommandThatRequireNumberOfTask(fullCommand);
                 break; 
@@ -96,15 +113,13 @@ public class UserInput {
     
     /**
     * Cleans the command from extra white spaces and upper cases
-    * Turn the command to array for later processes
+    * Split the command to array based on space for later processing
     * 
-    * @param command    The command received from user
+    * @param command    The command typed by the user
     * @return Separated command received from user 
     */
-    private String[] processCommand(String command){
+    public String[] processCommand(String command){//---------------------------------------public for testing
         command = command.trim().toLowerCase();
-        //String[] splitedCommand = command.split("\\s+");
-        //" +(?=(([^\"]*\"){2})*[^\"]*$)"
         String[] splitedCommand = command.split("\\s+(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
         for (int i = 0; i < splitedCommand.length; i++){
             splitedCommand[i] = splitedCommand[i].replaceAll("\"", "");
@@ -114,9 +129,9 @@ public class UserInput {
     
     
     
-     private boolean validateAddCommand(String[] fullCommand){
+    public boolean validateAddCommand(String[] fullCommand){//------------------------------public for testing
         boolean test = false;
-        if(checkingLengthOfCommand(fullCommand, numberOfOptionsForAddCommand())){
+        if(checkingLengthOfCommand(fullCommand, numberOfOptionsForAddCommand)){
             String date = getDateFromAddCommand(fullCommand);
             if(validateDate(date)){
                 test = true;
@@ -125,24 +140,16 @@ public class UserInput {
         return test;  
     }
      
-     private String getDateFromAddCommand(String[] fullCommand){
+    private String getDateFromAddCommand(String[] fullCommand){
         return fullCommand[2];
     }
      
-     private boolean checkingLengthOfCommand(String[] fullCommand, int neededLengthOfCommand){
-        if(fullCommand.length == neededLengthOfCommand){
-            return true;
-        }else{
-            return false;
-        }
+    private boolean checkingLengthOfCommand(String[] fullCommand, int neededLengthOfCommand){
+        return fullCommand.length == neededLengthOfCommand;
     }
      
-    private int numberOfOptionsForAddCommand(){
-        return 5;
-    }
-     
-     
-      private boolean validateDate(String date){
+   
+    private boolean validateDate(String date){
         
         boolean test = true;
         
@@ -166,7 +173,7 @@ public class UserInput {
     */
     private boolean validatePrintCommand(String[] fullCommand){
         boolean test = false;
-        if(checkingLengthOfCommand(fullCommand, sizeOfPrintCommand())){
+        if(checkingLengthOfCommand(fullCommand, sizeOfPrintCommand)){
             String commandsOption = getOptionFromFullCommand(fullCommand);
             if(commandsOption.contains("-") && validOptionsLettersForPrintCommand(commandsOption)){
                 test = true;
@@ -191,14 +198,15 @@ public class UserInput {
         return fullCommand[1];
     }
     
-    private int sizeOfPrintCommand(){
-        return 2;
-    }
-    
-    
+   
+    /**
+     * Validate command which are using number of the task as a option 
+     * @param fullCommand   The command received from user divided into pieces
+     * @return True/false if command has valid format
+     */
     private boolean validateCommandThatRequireNumberOfTask(String[] fullCommand){
         boolean test = false;
-        if(checkingLengthOfCommand(fullCommand, sizeOfCommandUsingTaskNumber())){
+        if(checkingLengthOfCommand(fullCommand, sizeOfCommandUsingTaskNumber)){
             String taskNumberInString = getOptionFromFullCommand(fullCommand);
             if(validateTaskNumber(taskNumberInString)){
                 int taskNumber = Integer.parseInt(taskNumberInString);
@@ -209,11 +217,6 @@ public class UserInput {
         }
         return test;  
     }
-    
-    private int sizeOfCommandUsingTaskNumber(){
-        return 2;
-    }
-    
     
     
     private boolean validateTaskNumber(String taskNumberInString){
@@ -227,8 +230,22 @@ public class UserInput {
         
         return test;
     }    
-
     
+    /**
+     * Validate commands responsible for file manipulation like "save" and "load"
+     * @param fullCommand   The command received from user divided into pieces
+     * @return True/false if command has valid format
+     */
+    private boolean validateFileManipulationCommand(String[] fullCommand){
+        return fullCommand.length == sizeOfFileManipulationCommand;
+    }
+    
+
+    /**
+     * Creates DTO object used to transport command between classes
+     * @param command   The command typed by the user
+     * @return DTO object of command
+     */
     private CommandDTO createCommand(String command){
         String[] fullCommand = processCommand(command);
         String mainCommand = getMainCommandFromFullCommand(fullCommand);
@@ -254,6 +271,11 @@ public class UserInput {
         return commandObject;
     }
     
+    /**
+     * Creates DTO object used to transport add command between classes
+     * @param command   The command typed by the user
+     * @return DTO object of add command
+     */
     private AddCommandDTO createAddCommand(String command){
         
         String[] fullCommand = processCommand(command);
@@ -287,6 +309,7 @@ public class UserInput {
     * Interprets and validates command received from user and follow the command order
     * 
     * @param command    The command received from user
+    * @return If user will type "exit" it returns true and program will know to exit
     */
     private boolean interpreteCommand(CommandDTO command){
         
@@ -296,11 +319,11 @@ public class UserInput {
         switch(command.getCommand()){
                 
             case "save":
-                controller.saveList();
+                saveToFile(command);
                 break;
                 
             case "load":
-                controller.loadList();
+                loadFromFile(command);
                 break;
                 
             case "help":
@@ -316,6 +339,7 @@ public class UserInput {
                 break;
                 
             case "edit":
+                editTask(command);
                 break;
                 
             case "remove":
@@ -346,37 +370,20 @@ public class UserInput {
     }
     
     
-    /**
-    * Sends "add" command typed by user to the Controller
-    * 
-    * @param fullCommand    The command received from user divided into pieces
-    */
-    private void addTaskToTaskList(CommandDTO command){
-            
-        TaskDTO task = createTask((AddCommandDTO) command);
-        controller.addTask(task);                      
+    private void saveToFile(CommandDTO command){
+        controller.saveListToFile(command.getOption());
     }
     
-    /**
-    * creates DTO object for transporting task to the list of tasks
-    * 
-    * @param fullCommand      The command received from user divided into pieces  
-    * @return Task DTO object
-    */
-    private TaskDTO createTask(AddCommandDTO addCommand){
-        
-        String task = addCommand.getTask();
-        String dateInString = addCommand.getDate();
-        Date date = parseDate(dateInString);
-        String status = addCommand.getStatus();
-        String project = addCommand.getProject();
-        
-        TaskDTO createdTask = new TaskDTO(task, date, status, project);
-        
-        return createdTask;
+    private void loadFromFile(CommandDTO command){
+        controller.loadListToFile(command.getOption());
     }
-      
-      
+
+   
+    public void addTaskToTaskList(CommandDTO command){//----------------------------------public for testing
+        controller.addTaskToList(command);        
+    }
+
+    
     private Date parseDate(String dateInString){
         SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
         Date date = null;
@@ -389,34 +396,26 @@ public class UserInput {
         return date;
     }
     
-      
-    /**
-    * Sends "remove" command typed by user to the Controller
-    * 
-    * @param fullCommand    The command received from user divided into pieces
-    */
+
     private void removeTaskFromList(CommandDTO command){
         
         int index = Integer.parseInt(command.getOption());
         controller.removeTask(index);
     }
     
-    
 
-    /**
-    * Sends "done" command typed by user to the Controller
-    * 
-    * @param fullCommand    The command received from user divided into pieces
-    */
     private void markTaskAsDone(CommandDTO command){
        
-            int index = Integer.parseInt(command.getOption());
-            controller.markTaskAsDone(index);
-        
+        int index = Integer.parseInt(command.getOption());
+        controller.markTaskAsDone(index);  
     }
-    
-    
-     private void printListOfTasks(CommandDTO command){
+
+
+    /**
+     * Sends request to output class to print the list based on selected criteria
+     * @param command Object used for transporting command between classes
+     */
+    private void printListOfTasks(CommandDTO command){
         
         String option = command.getOption();
         if(option.contains("a")){
@@ -469,7 +468,10 @@ public class UserInput {
     
 
     
-    
+    /**
+     * Ask user for name of the project which is part of the task
+     * @return New name of the project
+     */
     private String projectName(){
         output.askForProject();
         Scanner scanner = new Scanner(System.in);
@@ -478,10 +480,16 @@ public class UserInput {
         return project;
     }
     
+
+    /**
+     * After choosing "edit" command user is asked to specify option for "edit" command and specify 
+     * new part of the task which will be use to replace old part of the task
+     * @param command The command received from user
+     */
     private void editTask(CommandDTO command){
         int index = Integer.parseInt(command.getOption());
         
-        String userOption =askForOptionsForEditCommand();
+        String userOption = askForOptionsForEditCommand();
         if(validateEditTaskOption(userOption)){
             if(!isUserWantToGoBack(userOption)){
                 String userEditMessage = askForInputToEditTask();
@@ -535,7 +543,7 @@ public class UserInput {
         
         if(userOption.contains("-") && validOptionsLettersForEditCommand(userOption) && userOption.length() == 2){
                 isUserOptionValid = true;
-            }
+        }
         
         
         return isUserOptionValid;
@@ -557,7 +565,7 @@ public class UserInput {
      
      
      private void interpreteEditCommand(int index, String userOption, String userEditMessage){
-         switch(userOption){
+        switch(userOption){
             case "-t":
                 controller.editTask(index, userEditMessage);
                 break;
@@ -573,8 +581,9 @@ public class UserInput {
             default:
                 output.printErrorMessage();
                 break;
-         }
-     }
-
-    
+        }
+    } 
 }
+
+
+

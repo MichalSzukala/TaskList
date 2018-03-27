@@ -11,12 +11,13 @@ import com.git.michalszukala.controller.Controller;
  */
 public class UserOutput {
     
-    Controller controller;
+    private Controller controller;
     private final String COLOR_RED = "\u001B[31m";
     private final String COLOR_RESET = "\u001b[0m";
     
     /**
-    * Creates Controller object which is delegating all the tasks to proper classes
+    * Creates Controller object which will deliver all the tasks to proper classes
+    * @param controller Controller responsible to delegating all the tasks to proper classes
     */
     public UserOutput(Controller controller){
         this.controller = controller;
@@ -50,7 +51,7 @@ public class UserOutput {
     public void fileManipulationCommands(){
         System.out.println("\n*******************************************List of commands***********************************************\n");
         
-        String saveString = String.format("\n%-40s%s", "save[file name]","- Save to the File.  With the use of \"  \" it is possible to input multiple words");
+        String saveString = String.format("\n%-40s%s", "save[file name]","- Save to the File");
         System.out.printf(saveString);
         
         String loadString = String.format("\n%-40s%s", "load[file name]","- Load the File");
@@ -86,8 +87,8 @@ public class UserOutput {
         
         printOptions();
         
-        System.out.println("\nIt is possible to combine command's options. For example: \"print -id\" will print important and urgent tasks");
-
+        System.out.println("\nIt is possible to combine print options. For example: \"print -id\" will print important and urgent tasks");
+        System.out.println("With the use of \"  \" it is possible to input multiple words");
 
         printStars();
     }
@@ -110,7 +111,7 @@ public class UserOutput {
     /**
     * Ask user for input
     */
-    public void askForInput(){
+    public void askForInputMessage(){
         System.out.print("\nGive me an order: ");
     }
     
@@ -122,10 +123,32 @@ public class UserOutput {
     }
     
     /**
+    * Ask user which part of the task he want to modify
+    */
+    public void askForOptionsForEditCommand(){
+        System.out.print("\nOption's choices: [-t]task, [-d]due date, [-s]status, [-p]project, [-x]go back");
+        System.out.print("\nWhat do you want to edit?: ");
+    }
+    
+    /**
+    * Ask user for information used to edit task
+    */
+    public void askForInputToEditTask(){
+        System.out.print("\nGo ahead and type it: ");
+    }
+    
+    /**
     * Prints Error message
     */
     public void printErrorMessage(){
         System.out.println("Something is Wrong with Your Command!! Try again");
+    }
+    
+    /**
+    * Prints no file message
+    */
+    public void printNoFileMessage(){
+        System.out.println("The file is not existing, try different name");
     }
     
     /**
@@ -141,7 +164,7 @@ public class UserOutput {
     /**
     * Prints single Task on the screen
     */
-    public void printSingleTask(TaskDTO task, int index, String color){
+    public void printSingleTask(Task task, int index, String color){
         String taskNumber = String.format("%-7s", index);
         System.out.printf(color + taskNumber);
             
@@ -174,7 +197,7 @@ public class UserOutput {
         printListOfTasksStartText();
         
         for(int index = 0; index < controller.sizeOfTaskList(); index++){
-            TaskDTO task = controller.getTaskFromList(index);
+            Task task = controller.getTaskFromList(index);
             if(controller.isTaskUrgent(index)){
                 printSingleTask(task, index, COLOR_RED);
             }else{
@@ -194,7 +217,7 @@ public class UserOutput {
         printListOfTasksStartText();
         
         for(int index = 0; index < controller.sizeOfTaskList(); index++){
-            TaskDTO task = controller.getTaskFromList(index);
+            Task task = controller.getTaskFromList(index);
             if(controller.isTaskUrgent(index) && controller.isTaskImportant(index)){
                 printSingleTask(task, index, COLOR_RED);
             }   
@@ -211,7 +234,7 @@ public class UserOutput {
         printListOfTasksStartText();
         
         for(int index = 0; index < controller.sizeOfTaskList(); index++){
-            TaskDTO task = controller.getTaskFromList(index);
+            Task task = controller.getTaskFromList(index);
             if(controller.isTaskImportant(index)){
                 printSingleTask(task, index, COLOR_RESET);
             }   
@@ -228,7 +251,7 @@ public class UserOutput {
         printListOfTasksStartText();
         
         for(int index = 0; index < controller.sizeOfTaskList(); index++){
-            TaskDTO task = controller.getTaskFromList(index);
+            Task task = controller.getTaskFromList(index);
             if(controller.isTaskUrgent(index)){
                 printSingleTask(task, index, COLOR_RED);
             }   
@@ -245,7 +268,7 @@ public class UserOutput {
         printListOfTasksStartText();
         
         for(int index = 0; index < controller.sizeOfTaskList(); index++){
-            TaskDTO task = controller.getTaskFromList(index);
+            Task task = controller.getTaskFromList(index);
             if(controller.isProjectInTask(project, index)){
                 printSingleTask(task, index, COLOR_RESET);
             }
@@ -263,7 +286,7 @@ public class UserOutput {
         printListOfTasksStartText();
         
         for(int index = 0; index < controller.sizeOfTaskList(); index++){
-            TaskDTO task = controller.getTaskFromList(index);
+            Task task = controller.getTaskFromList(index);
             if(controller.isProjectInTask(project, index) && controller.isTaskUrgent(index) && controller.isTaskImportant(index)){
                 printSingleTask(task, index, COLOR_RED);
             }
@@ -281,7 +304,7 @@ public class UserOutput {
         printListOfTasksStartText();
         
         for(int index = 0; index < controller.sizeOfTaskList(); index++){
-            TaskDTO task = controller.getTaskFromList(index);
+            Task task = controller.getTaskFromList(index);
             if(controller.isProjectInTask(project, index) && controller.isTaskImportant(index)){
                 printSingleTask(task, index, COLOR_RESET);
             }
@@ -299,7 +322,7 @@ public class UserOutput {
         printListOfTasksStartText();
         
         for(int index = 0; index < controller.sizeOfTaskList(); index++){
-            TaskDTO task = controller.getTaskFromList(index);
+            Task task = controller.getTaskFromList(index);
             if(controller.isProjectInTask(project, index) && controller.isTaskUrgent(index)){
                 printSingleTask(task, index, COLOR_RED);
             }
