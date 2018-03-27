@@ -1,5 +1,6 @@
 package com.git.michalszukala.startUp;
 
+
 import com.git.michalszukala.view.UserInput;
 
 
@@ -12,13 +13,14 @@ import com.git.michalszukala.view.UserInput;
 public class TaskToRememberMain {
 
     /**
-     * Starts the program
+     * Creates GUI and starts the program
      * 
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        UserInput start = new UserInput();
-        start.startProgram();
         
+        UserInput graphicalInterface = new UserInput();
+        graphicalInterface.startGUI();
+
     }
 }
