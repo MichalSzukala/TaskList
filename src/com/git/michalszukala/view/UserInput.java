@@ -478,4 +478,103 @@ public class UserInput {
         return project;
     }
     
+    private void editTask(CommandDTO command){
+        int index = Integer.parseInt(command.getOption());
+        
+        String userOption =askForOptionsForEditCommand();
+        if(validateEditTaskOption(userOption)){
+            if(!isUserWantToGoBack(userOption)){
+                String userEditMessage = askForInputToEditTask();
+                if(validateEditTaskUserInput(userOption, userEditMessage)){
+                    interpreteEditCommand(index, userOption, userEditMessage);
+                }else {
+                    output.printErrorMessage();
+                }
+            }
+        }else{
+            output.printErrorMessage();
+        }
+    }
+    
+    private String askForOptionsForEditCommand(){
+        output.askForOptionsForEditCommand();
+        Scanner scanner =  new Scanner(System.in);
+        String userOption = scanner.nextLine();
+        return userOption;
+    }
+    
+    private String askForInputToEditTask(){
+        output.askForInputToEditTask();
+        Scanner scanner =  new Scanner(System.in);
+        String userEditMessage = scanner.nextLine();
+        return userEditMessage;
+    }
+            
+    
+    private boolean isUserWantToGoBack(String userOption){
+        return userOption.equals("-x");
+    }
+    
+    
+    
+    private boolean validateEditTaskUserInput(String userOption, String userEditMessage){
+        boolean isUserMessageValid = true;
+        if(userOption.contains("d")){
+            if(!validateDate(userEditMessage)){
+                isUserMessageValid = false;
+            }
+        }
+        return isUserMessageValid;
+    }
+    
+    
+    
+    
+    private boolean validateEditTaskOption(String userOption){
+        boolean isUserOptionValid = false;
+        
+        if(userOption.contains("-") && validOptionsLettersForEditCommand(userOption) && userOption.length() == 2){
+                isUserOptionValid = true;
+            }
+        
+        
+        return isUserOptionValid;
+    }
+    
+    
+     private boolean validOptionsLettersForEditCommand(String word){
+        boolean test = true;
+        
+        for(int i = 1; i < word.length(); i++){
+            if(word.charAt(i) != 't' && word.charAt(i) != 'd' && word.charAt(i) != 's' && word.charAt(i) != 'p' && word.charAt(i) != 'x'){
+                test = false;
+            }
+
+        }
+        
+        return test; 
+    }
+     
+     
+     private void interpreteEditCommand(int index, String userOption, String userEditMessage){
+         switch(userOption){
+            case "-t":
+                controller.editTask(index, userEditMessage);
+                break;
+            case "-d":
+                controller.editDueDate(index, parseDate(userEditMessage));
+                break;
+            case "-s":
+                controller.editStatus(index, userEditMessage);
+                break;
+            case "-p":
+                controller.editProject(index, userEditMessage);
+                break;
+            default:
+                output.printErrorMessage();
+                break;
+         }
+     }
+
+    
 }
