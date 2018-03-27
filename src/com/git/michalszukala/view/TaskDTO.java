@@ -17,10 +17,10 @@ public class TaskDTO {
     
     /**
     * Collects all the data needed to create Task 
-    * @param task   Message of the task
-    * @param dueDate   Due date of the task
-    * @param status   Status of the task
-    * @param project   Project name where the task is belonging
+    * @param task       Message of the task
+    * @param dueDate    Due date of the task
+    * @param status     Status of the task
+    * @param project    Project name where the task is belonging
     */
     public TaskDTO(String task, Date dueDate, String status, String project){
         this.task = task;
@@ -30,9 +30,9 @@ public class TaskDTO {
     }
     
     /**
-    * Getter for the message of the task
+    * Getter of the task
     * 
-    * @return Message of the task
+    * @return Task from the Task List
     */
     public String getTask(){
         return task;
@@ -63,6 +63,16 @@ public class TaskDTO {
     */
     public String getProject(){
         return project;
+    }
+    
+    
+    /**
+    * Setter for the status of the project 
+    * 
+    * @param status     Status of the task 
+    */
+    public void setStatus(String status){
+        this.status = status;
     }
     
 }
