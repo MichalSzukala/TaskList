@@ -1,7 +1,7 @@
 package com.git.michalszukala.controller;
 
 
-import com.git.michalszukala.view.TaskDTO;
+
 
 
 /**
@@ -30,9 +30,6 @@ public class Controller {
     
    
     
-    public void addTask(TaskDTO task){
-        System.out.println("TASK ADDED");
-    }
     
     
    public void showAllTasks(){
