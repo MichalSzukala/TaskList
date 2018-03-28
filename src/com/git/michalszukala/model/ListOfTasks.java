@@ -29,7 +29,7 @@ public class ListOfTasks implements ListOfTasksInterface<Task>{
     
 
     /**
-     * Convert from DTO object to task object which is stored in the list of thasks
+     * Convert from DTO object to task object which is stored in the list of tasks
      * @param command   Object used for transporting command between classes
      * @return  Task which is stored in the list of tasks
      */
@@ -58,6 +58,7 @@ public class ListOfTasks implements ListOfTasksInterface<Task>{
     * Add task to the list
     * @param task   Task which is stored in the list of tasks
     */
+    @Override
     public void addTaskToList(Task task){
         allTasks.add(task);
     }
@@ -65,6 +66,7 @@ public class ListOfTasks implements ListOfTasksInterface<Task>{
     
     /**
     * Gets task from the list
+    * @param index Number of the task it will be returned
     * @return Task from the list of tasks
     */
     public Task getTaskFromList(int index){
@@ -89,6 +91,7 @@ public class ListOfTasks implements ListOfTasksInterface<Task>{
     * Removes task from the list
     * @param index  Index of the task which will be removed
     */
+    @Override
     public void removeTask(int index){
         if(index < allTasks.size()){
             allTasks.remove(index);
@@ -99,6 +102,7 @@ public class ListOfTasks implements ListOfTasksInterface<Task>{
     * Marks task as a done task
     * @param index  Index of the task which will be marked as done
     */
+    @Override
     public void markTaskAsDone(int index){
         if(index < allTasks.size()){
             allTasks.get(index).setStatus("done");
@@ -167,7 +171,63 @@ public class ListOfTasks implements ListOfTasksInterface<Task>{
             }
     }  
     
+    /**
+    * Edits task title from the task object
+    * 
+    * @param index  Index of the task which will checked
+    * @param userEditMessage New task title
+    */
+    @Override
+    public void editTask(int index, String userEditMessage){{
+        Task task = allTasks.get(index);
+        task.setTask(userEditMessage);
+            
+        }
+    }
     
+    /**
+    * Edits status of the task object
+    * 
+    * @param index  Index of the task which will checked
+    * @param userEditMessage New task status
+    */
+    @Override
+    public void editStatus(int index, String userEditMessage){{
+        Task task = allTasks.get(index);
+        task.setStatus(userEditMessage);
+            
+        }
+    }
     
+    /**
+    * Edits due date of the task object
+    * 
+    * @param index  Index of the task which will checked
+    * @param userEditMessage New date of the task 
+    */
+    @Override
+    public void editDueDate(int index, Date userEditMessage){
+        Task task = allTasks.get(index);
+        task.setDueDate(userEditMessage);
+        
+    }
     
+    /**
+    * Edits project the task is belonging to 
+    * 
+    * @param index  Index of the task which will checked
+    * @param userEditMessage New project the task will belong to
+    */
+    @Override
+    public void editProject(int index, String userEditMessage){
+        Task task = allTasks.get(index);
+        task.setProject(userEditMessage);
+    }
+    
+    /**
+     * Sorts list of tasks according to the date
+     */
+    public void sortTasksAccordingToDate(){
+        allTasks = allTasks.stream().sorted().collect(Collectors.toList());
+    } 
 }
