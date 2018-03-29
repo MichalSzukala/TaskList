@@ -1,5 +1,6 @@
 package com.git.michalszukala.view;
 
+import com.git.michalszukala.model.Task;
 import com.git.michalszukala.controller.Controller;
 
 
@@ -12,8 +13,6 @@ import com.git.michalszukala.controller.Controller;
 public class UserOutput {
     
     private Controller controller;
-    private final String COLOR_RED = "\u001B[31m";
-    private final String COLOR_RESET = "\u001b[0m";
     
     /**
     * Creates Controller object which will deliver all the tasks to proper classes
@@ -87,7 +86,7 @@ public class UserOutput {
         
         printOptions();
         
-        System.out.println("\nIt is possible to combine print options. For example: \"print -id\" will print important and urgent tasks");
+        System.out.println("\nIt is possible to combine print options. Example: \"print -id\" will print important and urgent tasks");
         System.out.println("With the use of \"  \" it is possible to input multiple words");
 
         printStars();
@@ -163,24 +162,26 @@ public class UserOutput {
     
     /**
     * Prints single Task on the screen
+    * @param task   Single task on the list of tasks
+    * @param index  Index of the task
     */
-    public void printSingleTask(Task task, int index, String color){
+    public void printSingleTask(Task task, int index){
         String taskNumber = String.format("%-7s", index);
-        System.out.printf(color + taskNumber);
+        System.out.printf(taskNumber);
             
         String taskMessage = String.format("%-40s", task.getTask());
-        System.out.printf(color + taskMessage);
+        System.out.printf(taskMessage);
             
         String dueDate = String.format("%-15tF", task.getDueDate());
-        System.out.printf(color + dueDate);
+        System.out.printf(dueDate);
             
         String taskStatus = String.format("%-15s", task.getStatus());
-        System.out.printf(color + taskStatus);
+        System.out.printf(taskStatus);
             
         String taskProject = String.format("%-15s %n", task.getProject());
-        System.out.printf(color + taskProject);
+        System.out.printf( taskProject);
         
-        System.out.print(COLOR_RESET);
+        
     }
     
     /**
@@ -199,9 +200,9 @@ public class UserOutput {
         for(int index = 0; index < controller.sizeOfTaskList(); index++){
             Task task = controller.getTaskFromList(index);
             if(controller.isTaskUrgent(index)){
-                printSingleTask(task, index, COLOR_RED);
+                printSingleTask(task, index);
             }else{
-                printSingleTask(task, index, COLOR_RESET);
+                printSingleTask(task, index);
             }
         }
         if(controller.sizeOfTaskList() == 0){
@@ -219,7 +220,7 @@ public class UserOutput {
         for(int index = 0; index < controller.sizeOfTaskList(); index++){
             Task task = controller.getTaskFromList(index);
             if(controller.isTaskUrgent(index) && controller.isTaskImportant(index)){
-                printSingleTask(task, index, COLOR_RED);
+                printSingleTask(task, index);
             }   
         }
         if(controller.sizeOfTaskList() == 0){
@@ -236,7 +237,7 @@ public class UserOutput {
         for(int index = 0; index < controller.sizeOfTaskList(); index++){
             Task task = controller.getTaskFromList(index);
             if(controller.isTaskImportant(index)){
-                printSingleTask(task, index, COLOR_RESET);
+                printSingleTask(task, index);
             }   
         }
         if(controller.sizeOfTaskList() == 0){
@@ -253,7 +254,7 @@ public class UserOutput {
         for(int index = 0; index < controller.sizeOfTaskList(); index++){
             Task task = controller.getTaskFromList(index);
             if(controller.isTaskUrgent(index)){
-                printSingleTask(task, index, COLOR_RED);
+                printSingleTask(task, index);
             }   
         }
         if(controller.sizeOfTaskList() == 0){
@@ -263,6 +264,7 @@ public class UserOutput {
     
     /**
     * Prints tasks belonging to specific project
+    * @param project   Name of the project
     */
     public void printListOfTasksOfProject(String project){
         printListOfTasksStartText();
@@ -270,7 +272,7 @@ public class UserOutput {
         for(int index = 0; index < controller.sizeOfTaskList(); index++){
             Task task = controller.getTaskFromList(index);
             if(controller.isProjectInTask(project, index)){
-                printSingleTask(task, index, COLOR_RESET);
+                printSingleTask(task, index);
             }
         }
         
@@ -281,6 +283,7 @@ public class UserOutput {
     
     /**
     * Prints important tasks and tasks having due date of today
+    * @param project   Name of the project
     */
     public void printImportantAndUrgentTasksOfProject(String project){
         printListOfTasksStartText();
@@ -288,7 +291,7 @@ public class UserOutput {
         for(int index = 0; index < controller.sizeOfTaskList(); index++){
             Task task = controller.getTaskFromList(index);
             if(controller.isProjectInTask(project, index) && controller.isTaskUrgent(index) && controller.isTaskImportant(index)){
-                printSingleTask(task, index, COLOR_RED);
+                printSingleTask(task, index);
             }
         }
         
@@ -299,6 +302,7 @@ public class UserOutput {
     
     /**
     * Prints important tasks and tasks belonging to specific project from the list of tasks
+    * @param project   Name of the project
     */
     public void printImportantTasksOfProject(String project){
         printListOfTasksStartText();
@@ -306,7 +310,7 @@ public class UserOutput {
         for(int index = 0; index < controller.sizeOfTaskList(); index++){
             Task task = controller.getTaskFromList(index);
             if(controller.isProjectInTask(project, index) && controller.isTaskImportant(index)){
-                printSingleTask(task, index, COLOR_RESET);
+                printSingleTask(task, index);
             }
         }
         
@@ -317,6 +321,7 @@ public class UserOutput {
     
     /**
     * Prints tasks with due date of today and tasks belonging to specific project from the list of tasks
+    * @param project   Name of the project
     */
     public void printUrgentTasksOfProject(String project){
         printListOfTasksStartText();
@@ -324,7 +329,7 @@ public class UserOutput {
         for(int index = 0; index < controller.sizeOfTaskList(); index++){
             Task task = controller.getTaskFromList(index);
             if(controller.isProjectInTask(project, index) && controller.isTaskUrgent(index)){
-                printSingleTask(task, index, COLOR_RED);
+                printSingleTask(task, index);
             }
         }
         
