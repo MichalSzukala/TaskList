@@ -81,6 +81,7 @@ public class InputOutputToFile {
             try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(pathInString))){
                 listOfTasks = (ArrayList<Task>)inputStream.readObject();
                 listOfTasks.stream().forEach((Task task)->controller.addTaskToList(task));
+                controller.loadingListWasSuccess();
             }catch (Exception ex) {
                 ex.printStackTrace();
             }

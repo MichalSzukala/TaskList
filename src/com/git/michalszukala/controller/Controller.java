@@ -182,5 +182,12 @@ public class Controller {
     public void markTaskAsDone(int index){
         listOfTasks.markTaskAsDone(index);
     }
+    
+    /**
+     * Prints message that list of tasks was loaded successfully
+     */
+    public void loadingListWasSuccess(){
+        userOutput.loadingListWasSuccess();
+    }
 }
 

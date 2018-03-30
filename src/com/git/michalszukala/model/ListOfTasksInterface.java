@@ -8,7 +8,7 @@ import java.util.Date;
  */
 public interface ListOfTasksInterface <T>{
     
-   public void addTaskToList(T task);
+   public void addTaskToList(T t);
    public void removeTask(int index);
    public void markTaskAsDone(int index);
    public void editTask(int index, String userEditMessage);

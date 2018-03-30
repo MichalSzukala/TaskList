@@ -338,5 +338,11 @@ public class UserOutput {
         }
     }
     
+    /**
+     * Prints message that list of tasks was loaded successfully
+     */
+    public void loadingListWasSuccess(){
+        System.out.println("List of Tasks is loaded");
+    }
 
 }
