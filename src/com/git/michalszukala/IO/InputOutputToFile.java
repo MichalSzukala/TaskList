@@ -67,4 +67,26 @@ public class InputOutputToFile {
             listOfTasks.add(controller.getTaskFromList(index));
         }
     }
+    
+    /**
+    * Read object of list of tasks from the file and sends it to the ListOfTasks class
+    * @param nameOfFile     The name specify by the user
+    */
+    public void readFromFile(String nameOfFile){
+            
+        Path path = Paths.get("IO/" + nameOfFile);
+        String pathInString = "IO/" + nameOfFile;
+
+        if(Files.exists(path)){
+            try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(pathInString))){
+                listOfTasks = (ArrayList<Task>)inputStream.readObject();
+                listOfTasks.stream().forEach((Task task)->controller.addTaskToList(task));
+            }catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }else{
+            controller.printNoFileMessage();
+        }
+            
+    }
 }
