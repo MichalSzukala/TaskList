@@ -1,7 +1,7 @@
 package com.git.michalszukala.controller;
 
 
-import com.git.michalszukala.IO.InputOutputToFile;
+import com.git.michalszukala.IO.IO;
 import com.git.michalszukala.model.ListOfTasks;
 import com.git.michalszukala.view.CommandDTO;
 import com.git.michalszukala.model.Task;
@@ -21,18 +21,18 @@ public class Controller {
     
     
     private ListOfTasks listOfTasks;
-    private InputOutputToFile inputOutput;
+    private IO inputOutput;
     private UserOutput userOutput;
    
     
     /**
     * Creates List of Tasks which will contain all of the tasks
-    * Creates UserOutput object which is displaying all the output on the screen
-    * Creates InputOutputToFile which is responsible for saving and loading data
+ Creates UserOutput object which is displaying all the output on the screen
+ Creates IO which is responsible for saving and loading data
     */
     public Controller(){
         listOfTasks = new ListOfTasks();
-        inputOutput = new InputOutputToFile(this);
+        inputOutput = new IO(this);
         userOutput = new UserOutput(this);
         
     }

@@ -21,7 +21,7 @@ import java.util.List;
  * @author Michal Szukala
  * @version 1.0
  */
-public class InputOutputToFile {
+public class IO {
     
     private List<Task> listOfTasks;
     private Controller controller;
@@ -30,7 +30,7 @@ public class InputOutputToFile {
      * Creates list of task where information from the file will be moved
      * @param controller Responsible for sending information from file to list of tasks
      */
-    public InputOutputToFile(Controller controller){
+    public IO(Controller controller){
         listOfTasks = null;
         this.controller = controller;
         

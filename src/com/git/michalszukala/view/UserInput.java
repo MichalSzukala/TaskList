@@ -34,9 +34,9 @@ public class UserInput {
     
     
     /**
-    * Sends request to UserOutput class to create GUI, and starts asking user for input
+    * Sends request to UserOutput class to create Display, and starts asking user for input
     */
-    public void startGUI(){
+    public void createGUI(){
         output.createDisplay();
         askForInput();
     }
